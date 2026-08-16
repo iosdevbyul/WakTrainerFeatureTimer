@@ -20,7 +20,7 @@ public struct CapsuleTimerView: View {
     }
     
     public var body: some View {
-        Text(formattedTime(timerManager.elapsedTime))
+        Text(timerManager.elapsedTime.formattedTimeString)
             .font(.system(size: 18, weight: .bold, design: .monospaced))
             .foregroundColor(textColor)
             .padding(.horizontal, 20)
@@ -28,20 +28,6 @@ public struct CapsuleTimerView: View {
             .background(Color.white)
             .clipShape(Capsule())
             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-    }
-    
-    // 초 단위를 MM:ss 또는 HH:mm:ss 형식으로 변환
-    private func formattedTime(_ totalSeconds: TimeInterval) -> String {
-        let total = Int(totalSeconds)
-        let hours = total / 3600
-        let minutes = (total % 3600) / 60
-        let seconds = total % 60
-        
-        if hours > 0 {
-            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%02d:%02d", minutes, seconds)
-        }
     }
 }
 

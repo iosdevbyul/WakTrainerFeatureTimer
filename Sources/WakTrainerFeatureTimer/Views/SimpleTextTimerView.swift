@@ -25,22 +25,8 @@ public struct SimpleTextTimerView: View {
     }
     
     public var body: some View {
-        Text(formattedTime(timerManager.elapsedTime))
+        Text(timerManager.elapsedTime.formattedTimeString)
             .font(font)
             .foregroundColor(textColor)
-    }
-    
-    // 초 단위를 MM:ss 또는 HH:mm:ss로 변환
-    private func formattedTime(_ totalSeconds: TimeInterval) -> String {
-        let total = Int(totalSeconds)
-        let hours = total / 3600
-        let minutes = (total % 3600) / 60
-        let seconds = total % 60
-        
-        if hours > 0 {
-            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%02d:%02d", minutes, seconds)
-        }
     }
 }
