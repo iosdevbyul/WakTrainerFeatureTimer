@@ -6,11 +6,16 @@
 //
 
 import SwiftUI
+import WakTrainerCoreModels
 
 public struct LapTimerView: View {
-    @StateObject private var timerManager = TimerManager()
+    // 1. 내부 생성이 아닌 외부 주입(@ObservedObject)으로 변경
+    @ObservedObject var timerManager: TimerManager
     
-    public init() {}
+    // 2. 외부에서 매니저를 넘겨받는 생성자 정의
+    public init(timerManager: TimerManager) {
+        self.timerManager = timerManager
+    }
     
     // 최단/최장 랩 계산용
     private var minLapTime: TimeInterval? {
@@ -85,12 +90,12 @@ public struct LapTimerView: View {
         }
     }
     
-    // 좌측 버튼 동작
+    // 좌측 버튼 동작 (recordLap / reset 호출)
     private func leftButtonAction() {
         if timerManager.isRunning {
-            timerManager.addLap()
+            timerManager.recordLap() // addLap() 대신 recordLap()
         } else {
-            timerManager.stop()
+            timerManager.reset()     // stop() 대신 reset() (또는 stop())
         }
     }
     

@@ -2,22 +2,33 @@ import Foundation
 import Combine
 import WakTrainerCoreModels
 
+// 타이머의 세부 상태
+public enum TimerState {
+    case idle
+    case running
+    case paused
+}
+
 public final class TimerManager: ObservableObject, TimerManagerProtocol, @unchecked Sendable {
     @Published public private(set) var elapsedTime: TimeInterval = 0
-    @Published public private(set) var isRunning: Bool = false
+    @Published public private(set) var state: TimerState = .idle
     @Published public private(set) var laps: [LapItem] = []
+    
+    // MARK: - TimerManagerProtocol 준수
+    public var isRunning: Bool {
+        state == .running
+    }
     
     private var timerSubscription: AnyCancellable?
     private var startDate: Date?
     private var accumulatedTime: TimeInterval = 0
-    
-    private var lastLapTime: TimeInterval = 0 // 직전 랩 찍었을 때의 elapsedTime
+    private var lastLapTime: TimeInterval = 0
     
     public init() {}
     
     public func start() {
-        guard !isRunning else { return }
-        isRunning = true
+        guard state != .running else { return }
+        state = .running
         
         startDate = Date()
         
@@ -29,8 +40,8 @@ public final class TimerManager: ObservableObject, TimerManagerProtocol, @unchec
     }
     
     public func pause() {
-        guard isRunning else { return }
-        isRunning = false
+        guard state == .running else { return }
+        state = .paused
         
         if let startDate = startDate {
             accumulatedTime += Date().timeIntervalSince(startDate)
@@ -41,17 +52,29 @@ public final class TimerManager: ObservableObject, TimerManagerProtocol, @unchec
         timerSubscription = nil
     }
     
+    // Protocol 요구사항: stop()
     public func stop() {
-        pause()
+        if state == .running {
+            timerSubscription?.cancel()
+            timerSubscription = nil
+            startDate = nil
+        }
+        
+        state = .idle
         accumulatedTime = 0
         elapsedTime = 0
         lastLapTime = 0
         laps.removeAll()
     }
     
-    // 랩 타임 추가
-    public func addLap() {
-        guard isRunning else { return }
+    // 데모 편의용 Alias (reset -> stop)
+    public func reset() {
+        stop()
+    }
+    
+    // 랩 기록 메서드
+    public func recordLap() {
+        guard state == .running else { return }
         
         let currentTotal = elapsedTime
         let currentLapDuration = currentTotal - lastLapTime
@@ -63,7 +86,6 @@ public final class TimerManager: ObservableObject, TimerManagerProtocol, @unchec
             displayTime: currentTotal
         )
         
-        // 최신 랩이 위에 오도록 맨 앞에 추가
         laps.insert(newLap, at: 0)
         lastLapTime = currentTotal
     }
