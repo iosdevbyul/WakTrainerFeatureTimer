@@ -54,17 +54,40 @@ public final class TimerManager: ObservableObject, TimerManagerProtocol, @unchec
     
     // Protocol 요구사항: stop()
     public func stop() {
-        if state == .running {
-            timerSubscription?.cancel()
-            timerSubscription = nil
-            startDate = nil
-        }
-        
+        timerSubscription?.cancel()
+        timerSubscription = nil
+        startDate = nil
+
         state = .idle
         accumulatedTime = 0
         elapsedTime = 0
         lastLapTime = 0
         laps.removeAll()
+    }
+
+    public func restore(
+        elapsedTime: TimeInterval,
+        laps: [LapItem] = []
+    ) {
+        timerSubscription?.cancel()
+        timerSubscription = nil
+        startDate = nil
+
+        let normalizedElapsedTime = max(
+            0,
+            elapsedTime
+        )
+
+        accumulatedTime = normalizedElapsedTime
+        self.elapsedTime = normalizedElapsedTime
+        self.laps = laps
+        lastLapTime =
+            laps.first?.displayTime ??
+            normalizedElapsedTime
+
+        state = normalizedElapsedTime > 0
+            ? .paused
+            : .idle
     }
     
     // 데모 편의용 Alias (reset -> stop)
