@@ -34,7 +34,7 @@ struct TimerManagerRestoreTests {
 
         timer.stop()
 
-        #expect(timer.state == .paused)
+        #expect(timer.state == .idle)
         #expect(timer.elapsedTime == 0)
         #expect(timer.laps.isEmpty)
     }
@@ -47,7 +47,7 @@ struct TimerManagerRestoreTests {
             elapsedTime: -10
         )
 
-        #expect(timer.state == .idle)
+        #expect(timer.state == .paused)
         #expect(timer.elapsedTime == 0)
     }
 }
