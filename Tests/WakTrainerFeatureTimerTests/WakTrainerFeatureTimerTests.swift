@@ -1,8 +1,53 @@
 import Testing
+
 @testable import WakTrainerFeatureTimer
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-    // Swift Testing Documentation
-    // https://developer.apple.com/documentation/testing
+@Suite("TimerManager restore")
+struct TimerManagerRestoreTests {
+
+    @Test("restore places a persisted timer into paused state")
+    func restoreElapsedTime() {
+        let timer = TimerManager()
+
+        timer.restore(
+            elapsedTime: 321
+        )
+
+        #expect(timer.elapsedTime == 321)
+        #expect(timer.state == .paused)
+        #expect(!timer.isRunning)
+        #expect(timer.laps.isEmpty)
+    }
+
+    @Test("restored timer can resume and reset")
+    func restoredTimerCanResumeAndReset() {
+        let timer = TimerManager()
+
+        timer.restore(
+            elapsedTime: 120
+        )
+
+        timer.start()
+
+        #expect(timer.state == .running)
+        #expect(timer.isRunning)
+
+        timer.stop()
+
+        #expect(timer.state == .idle)
+        #expect(timer.elapsedTime == 0)
+        #expect(timer.laps.isEmpty)
+    }
+
+    @Test("zero restore remains idle")
+    func zeroRestoreRemainsIdle() {
+        let timer = TimerManager()
+
+        timer.restore(
+            elapsedTime: -10
+        )
+
+        #expect(timer.state == .idle)
+        #expect(timer.elapsedTime == 0)
+    }
 }
