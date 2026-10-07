@@ -85,9 +85,7 @@ public final class TimerManager: ObservableObject, TimerManagerProtocol, @unchec
             laps.first?.displayTime ??
             normalizedElapsedTime
 
-        state = normalizedElapsedTime > 0
-            ? .paused
-            : .idle
+        state = .paused
     }
     
     // 데모 편의용 Alias (reset -> stop)
