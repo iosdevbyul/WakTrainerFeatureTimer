@@ -39,15 +39,15 @@ struct TimerManagerRestoreTests {
         #expect(timer.laps.isEmpty)
     }
 
-    @Test("zero restore remains idle")
-    func zeroRestoreRemainsIdle() {
+    @Test("zero restore remains paused for persisted sessions")
+    func zeroRestoreRemainsPaused() {
         let timer = TimerManager()
 
         timer.restore(
             elapsedTime: -10
         )
 
-        #expect(timer.state == .idle)
+        #expect(timer.state == .paused)
         #expect(timer.elapsedTime == 0)
     }
 }
